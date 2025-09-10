@@ -109,11 +109,12 @@ const mockPets: Pet[] = [
 
 export default function DogCatApp() {
   const [showSplash, setShowSplash] = useState(true)
+  const [showModeSelection, setShowModeSelection] = useState(false)
   const [currentPetIndex, setCurrentPetIndex] = useState(0)
   const [showDetails, setShowDetails] = useState(false)
   const [pets] = useState<Pet[]>(mockPets)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
-  const [showLauncher, setShowLauncher] = useState(true)
+  const [showLauncher, setShowLauncher] = useState(false)
   const [showActionButtons, setShowActionButtons] = useState(false)
   const [acceptedPet, setAcceptedPet] = useState<Pet | null>(null)
   const [showContactInfo, setShowContactInfo] = useState(false)
@@ -210,13 +211,80 @@ export default function DogCatApp() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false)
-      setShowLauncher(false)
+      setShowModeSelection(true)
     }, 3000)
 
     return () => clearTimeout(timer)
   }, [])
 
   const currentPet = availablePets[currentPetIndex]
+
+  if (showModeSelection) {
+    return (
+      <div className="min-h-screen relative flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0">
+          <Image src="/context-welcome-background.jpeg" alt="Selección de modo" fill className="object-cover" />
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
+        <div className="relative z-10 text-center max-w-md mx-auto p-6">
+          <div className="mb-8">
+            <Image
+              src="/dogcat-logo.png"
+              alt="DogCat"
+              width={120}
+              height={120}
+              className="mx-auto rounded-2xl shadow-2xl mb-4"
+            />
+            <h1 className="text-3xl font-bold text-white mb-2">Elige tu experiencia</h1>
+            <p className="text-white/80 text-sm">Selecciona el modo que mejor se adapte a tus necesidades</p>
+          </div>
+
+          <div className="space-y-4">
+            <Button
+              onClick={() => {
+                setShowModeSelection(false)
+                setShowLauncher(true)
+              }}
+              className="w-full h-20 bg-primary text-primary-foreground hover:bg-primary/90 relative overflow-hidden"
+            >
+              <div className="absolute inset-0">
+                <Image src="/context-pets-playing.jpeg" alt="Modo Normal" fill className="object-cover opacity-20" />
+              </div>
+              <div className="relative z-10 text-center">
+                <h3 className="font-bold text-lg mb-1">Modo Normal</h3>
+                <p className="text-sm opacity-90">Funcionalidad completa con todas las características</p>
+              </div>
+            </Button>
+
+            <Button
+              onClick={() => {
+                window.location.href = "/simple"
+              }}
+              variant="outline"
+              className="w-full h-20 border-2 border-white text-white hover:bg-white hover:text-foreground relative overflow-hidden"
+            >
+              <div className="absolute inset-0">
+                <Image
+                  src="/context-adoption-interface.jpeg"
+                  alt="Modo Simple"
+                  fill
+                  className="object-cover opacity-20"
+                />
+              </div>
+              <div className="relative z-10 text-center">
+                <h3 className="font-bold text-lg mb-1">Modo Simple</h3>
+                <p className="text-sm opacity-90">Solo mascotas encontradas con generador de QR</p>
+              </div>
+            </Button>
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-white/60 text-xs">Puedes cambiar de modo en cualquier momento desde la configuración</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (showSplash) {
     return (
