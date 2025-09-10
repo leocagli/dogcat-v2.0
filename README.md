@@ -28,3 +28,22 @@ Continue building your app on:
 2. Deploy your chats from the v0 interface
 3. Changes are automatically pushed to this repository
 4. Vercel deploys the latest version from this repository
+
+## Local development
+
+Install dependencies using [pnpm](https://pnpm.io):
+
+```bash
+pnpm install
+```
+
+Available scripts:
+
+```bash
+pnpm dev        # Start the development server
+pnpm lint       # Run ESLint
+pnpm typecheck  # Check TypeScript types
+pnpm build      # Create a production build
+```
+
+The CI pipeline runs `pnpm lint`, `pnpm typecheck` and `pnpm build` to prevent deployments when linting or type errors are present.
