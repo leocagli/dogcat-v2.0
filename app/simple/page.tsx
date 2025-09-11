@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ArrowLeft, QrCode, Phone, MessageCircle, MapPin, Calendar, Download, Printer as Print } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import * as QRCode from "qrcode"
+import QRCode from "qrcode"
 
 interface Pet {
   id: string
@@ -130,38 +130,63 @@ export default function SimpleModeApp() {
   }, [pets, searchTerm, typeFilter, sizeFilter])
 
   const generateQRCode = async () => {
-    const petData = {
-      name: petProfile.name,
-      type: petProfile.type,
-      breed: petProfile.breed,
-      color: petProfile.color,
-      size: petProfile.size,
-      owner: petProfile.ownerName,
-      phone: petProfile.ownerPhone,
-      whatsapp: petProfile.ownerWhatsapp,
-      medical: petProfile.medicalInfo,
-      notes: petProfile.specialNotes,
-      url: `https://dogcat.app/pet/${petProfile.name.toLowerCase().replace(/\s+/g, "-")}`,
+    if (!petProfile.name || !petProfile.ownerName || !petProfile.ownerPhone) {
+      alert("Por favor completa al menos el nombre de la mascota, tu nombre y teléfono")
+      return
     }
 
-    const qrText = `🐕 ${petData.name}
-📱 ${petData.phone}
-👤 ${petData.owner}
-🏠 Si me encuentras, por favor contacta a mi familia
-🌐 ${petData.url}`
+    const petDataHTML = `
+🐾 INFORMACIÓN DE MASCOTA 🐾
+
+Nombre: ${petProfile.name}
+Tipo: ${petProfile.type.charAt(0).toUpperCase() + petProfile.type.slice(1)}
+Raza: ${petProfile.breed}
+Color: ${petProfile.color}
+Tamaño: ${petProfile.size.charAt(0).toUpperCase() + petProfile.size.slice(1)}
+
+👤 CONTACTO DEL DUEÑO:
+Nombre: ${petProfile.ownerName}
+Teléfono: ${petProfile.ownerPhone}${
+      petProfile.ownerWhatsapp
+        ? `
+WhatsApp: ${petProfile.ownerWhatsapp}`
+        : ""
+    }
+
+${
+  petProfile.medicalInfo
+    ? `🏥 INFORMACIÓN MÉDICA:
+${petProfile.medicalInfo}
+
+`
+    : ""
+}${
+  petProfile.specialNotes
+    ? `📝 NOTAS ESPECIALES:
+${petProfile.specialNotes}
+
+`
+    : ""
+}📞 Si encontraste a ${petProfile.name}, por favor contacta inmediatamente a ${petProfile.ownerName} al ${petProfile.ownerPhone}
+
+¡Gracias por ayudar a reunir a ${petProfile.name} con su familia! 💕
+    `.trim()
 
     try {
-      const qrDataUrl = await QRCode.toDataURL(qrText, {
-        width: 300,
-        margin: 2,
+      const qrDataUrl = await QRCode.toDataURL(petDataHTML, {
+        width: 400,
+        margin: 3,
         color: {
           dark: "#000000",
           light: "#FFFFFF",
         },
+        errorCorrectionLevel: "M",
       })
+      console.log("[v0] QR Code generated successfully")
       setQrCodeUrl(qrDataUrl)
     } catch (error) {
-      console.error("Error generating QR code:", error)
+      console.error("[v0] Error generating QR code:", error)
+      alert("Error al generar el código QR. Por favor intenta nuevamente.")
     }
   }
 
@@ -253,11 +278,11 @@ export default function SimpleModeApp() {
                 Generar QR
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Generar QR para Collar</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4">
+              <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium">Nombre</label>
@@ -376,9 +401,23 @@ export default function SimpleModeApp() {
                 </Button>
 
                 {qrCodeUrl && (
-                  <div className="text-center space-y-4">
-                    <div className="p-4 bg-white rounded-lg inline-block">
-                      <img src={qrCodeUrl || "/placeholder.svg"} alt="QR Code" className="mx-auto" />
+                  <div className="text-center space-y-4 pt-4">
+                    <div className="p-6 bg-white rounded-lg inline-block border-2 border-gray-200 shadow-sm">
+                      <img
+                        src={qrCodeUrl || "/placeholder.svg"}
+                        alt="QR Code"
+                        className="mx-auto block"
+                        style={{
+                          width: "300px",
+                          height: "300px",
+                          objectFit: "contain",
+                        }}
+                        onError={(e) => {
+                          console.error("[v0] Error loading QR image")
+                          e.currentTarget.style.display = "none"
+                        }}
+                        onLoad={() => console.log("[v0] QR image loaded successfully")}
+                      />
                     </div>
                     <div className="flex gap-2">
                       <Button onClick={downloadQRCode} variant="outline" className="flex-1 bg-transparent">
@@ -390,8 +429,9 @@ export default function SimpleModeApp() {
                         Imprimir
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Pega este QR en el collar de tu mascota para facilitar su recuperación
+                    <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                      Pega este QR en el collar de tu mascota para facilitar su recuperación. El código contiene toda la
+                      información de contacto necesaria.
                     </p>
                   </div>
                 )}

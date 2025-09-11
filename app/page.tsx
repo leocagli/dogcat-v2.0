@@ -260,8 +260,7 @@ export default function DogCatApp() {
               onClick={() => {
                 window.location.href = "/simple"
               }}
-              variant="outline"
-              className="w-full h-20 border-2 border-white text-white hover:bg-white hover:text-foreground relative overflow-hidden"
+              className="w-full h-20 bg-emerald-600 text-white hover:bg-emerald-700 relative overflow-hidden"
             >
               <div className="absolute inset-0">
                 <Image
@@ -571,20 +570,22 @@ export default function DogCatApp() {
 
                 <div className="space-y-2">
                   <Button
+                    size="sm"
                     onClick={() => handleContact("phone")}
-                    className="w-full bg-primary text-primary-foreground h-12"
+                    className="flex-1 bg-primary text-primary-foreground"
                   >
-                    <Phone className="h-5 w-5 mr-3" />
+                    <Phone className="h-4 w-4 mr-2" />
                     Llamar ahora
                   </Button>
 
                   {acceptedPet.contact.whatsapp && (
                     <Button
-                      onClick={() => handleContact("whatsapp")}
+                      size="sm"
                       variant="outline"
-                      className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground h-12"
+                      onClick={() => handleContact("whatsapp")}
+                      className="flex-1 text-primary border-primary hover:bg-primary hover:text-primary-foreground"
                     >
-                      <MessageCircle className="h-5 w-5 mr-3" />
+                      <MessageCircle className="h-4 w-4 mr-2" />
                       Enviar WhatsApp
                     </Button>
                   )}
